@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite. If another app already uses `localhost:5173`, try `http://127.0.0.1:5173/` or the network URL printed by Vite. For a production build and checks:
+Open `http://localhost:5180/` or the network URL printed by Vite. The development server uses port 5180 and reports an error if that port is already in use. For a production build and checks:
 
 ```sh
 npm run lint
@@ -22,6 +22,8 @@ npm run build
 ## How it works
 
 `src/App.tsx` contains the home and drawing screens. `src/features/drawing/DrawingCanvas.tsx` handles Pointer Events and canvas resizing; `src/engine/drawing.ts` owns normalized stroke data, rendering, and history. Strokes are resolution-independent and remain editable in memory as the canvas resizes. A new stroke after undo clears the redo branch. Erasing is an editable stroke, so it can be undone. Clear removes all history after confirmation.
+
+The drawing surface fills the screen. Drag anywhere on the drawing tools to move them; they snap to the nearest edge. Tap a button to use it, or use minus and plus to minimize and expand the tools. Colors remain against the screen edge when minimized; the toggle stays in place on the inner strip. If space is limited, scroll along a strip to reach its remaining buttons. To move the palette with a keyboard, focus the drawing tools group and use the arrow keys.
 
 Finger, stylus, and mouse input are accepted. One pointer is accepted at a time; the app does not currently distinguish a palm from a finger or implement palm rejection. Interrupted strokes are retained. Pointer moves redraw the canvas without triggering React updates for each point.
 

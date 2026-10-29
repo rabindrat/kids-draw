@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react'
 
-type IconName = 'arrow' | 'back' | 'brush' | 'eraser' | 'undo' | 'redo' | 'trash' | 'sparkle' | 'close'
+type IconName = 'arrow' | 'back' | 'brush' | 'eraser' | 'undo' | 'redo' | 'trash' | 'sparkle' | 'close' | 'minimize' | 'expand'
 const paths: Record<IconName, React.ReactNode> = {
   arrow: <><path d="M4 12h15M13 6l6 6-6 6" /></>,
   back: <><path d="M20 12H5M11 6l-6 6 6 6" /></>,
@@ -10,6 +10,8 @@ const paths: Record<IconName, React.ReactNode> = {
   redo: <><path d="m15 7 5 5-5 5"/><path d="M19 12h-8a6 6 0 0 0-6 6"/></>,
   trash: <><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/></>,
   sparkle: <><path d="M12 2c.8 5 2.4 6.7 7 7.5-4.6.8-6.2 2.5-7 7.5-.8-5-2.4-6.7-7-7.5C9.6 8.7 11.2 7 12 2Z"/><path d="M19 16v5M16.5 18.5h5"/></>,
+  minimize: <path d="M5 12h14"/>,
+  expand: <><path d="M12 5v14M5 12h14"/></>,
   close: <path d="m6 6 12 12M18 6 6 18"/>,
 }
 export function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconName }) {

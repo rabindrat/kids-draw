@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Icon } from './components/Icon'
 import { addStroke, emptyHistory, redo, undo, type Stroke } from './engine/drawing'
 import { DrawingCanvas } from './features/drawing/DrawingCanvas'
+import { FloatingToolbar } from './features/drawing/FloatingToolbar'
 
 const colors = [
   { name: 'Berry', value: '#d45f64' }, { name: 'Tangerine', value: '#efa35f' },
@@ -85,27 +86,22 @@ function Workspace({ history, setHistory, onHome }: { history: ReturnType<typeof
   const [size, setSize] = useState(sizes[1].value)
   const [tool, setTool] = useState<Stroke['tool']>('brush')
   const [confirmClear, setConfirmClear] = useState(false)
-  return <div className="workspace">
-    <header className="workspace-header"><button className="back-button" onClick={onHome}><Icon name="back"/><span>Home</span></button><Logo/><div className="workspace-label"><span>✳</span> YOUR CREATIVE SPACE</div></header>
-    <main className="workspace-main">
-      <div className="workspace-heading"><div><div className="eyebrow"><span className="eyebrow-dot"/> YOUR IMAGINATION, YOUR RULES</div><h1>Let's draw<span className="heading-dot">.</span></h1><p>Pick a color and see where it takes you.</p></div><div className="workspace-doodle" aria-hidden="true">✳ <span>anything is possible!</span></div></div>
-      <div className="drawing-area">
-        <aside className="toolbar" aria-label="Drawing tools">
-          <div className="tool-section"><span className="tool-label">TOOLS</span><div className="tool-row">
-            <button className={`tool-button ${tool === 'brush' ? 'selected' : ''}`} onClick={() => setTool('brush')} aria-pressed={tool === 'brush'} aria-label="Brush"><Icon name="brush"/><span>Brush</span></button>
-            <button className={`tool-button ${tool === 'eraser' ? 'selected' : ''}`} onClick={() => setTool('eraser')} aria-pressed={tool === 'eraser'} aria-label="Eraser"><Icon name="eraser"/><span>Eraser</span></button>
-          </div></div>
-          <div className="tool-section"><span className="tool-label">COLORS</span><div className="color-grid">{colors.map((item) => <button key={item.value} className={`color-button ${color === item.value && tool === 'brush' ? 'active' : ''}`} style={{ '--swatch': item.value } as React.CSSProperties} aria-label={item.name} aria-pressed={color === item.value && tool === 'brush'} onClick={() => { setColor(item.value); setTool('brush') }}><span/></button>)}</div></div>
-          <div className="tool-section"><span className="tool-label">SIZE</span><div className="size-row">{sizes.map((item, index) => <button key={item.name} className={`size-button ${size === item.value ? 'active' : ''}`} aria-label={`${item.name} brush size`} aria-pressed={size === item.value} onClick={() => setSize(item.value)}><span style={{ width: 7 + index * 5, height: 7 + index * 5 }}/></button>)}</div></div>
-          <div className="tool-section history-section"><span className="tool-label">A LITTLE HELP</span><div className="tool-row"><button className="tool-button" disabled={!history.strokes.length} onClick={() => setHistory(undo)}><Icon name="undo"/><span>Undo</span></button><button className="tool-button" disabled={!history.undone.length} onClick={() => setHistory(redo)}><Icon name="redo"/><span>Redo</span></button></div></div>
-          <button className="clear-button" disabled={!history.strokes.length} onClick={() => setConfirmClear(true)}><Icon name="trash"/> Clear page</button>
-        </aside>
-        <div className="paper-wrap"><div className="paper-top"><span>YOUR MASTERPIECE</span><span>✦ &nbsp; MADE BY YOU</span></div><div className="paper"><DrawingCanvas strokes={history.strokes} color={color} size={size} tool={tool} onStroke={(stroke) => setHistory((current) => addStroke(current, stroke))}/>{!history.strokes.length && <div className="canvas-hint" aria-hidden="true"><span>✦</span><p>A blank page is full<br/>of possibilities.</p><small>START DRAWING ANYWHERE</small></div>}</div><div className="paper-bottom"><span>✳ &nbsp; MADE WITH IMAGINATION</span><span>LET YOUR IDEAS WANDER</span></div></div>
+  const homeRef = useRef<HTMLButtonElement>(null)
+  return <main className="workspace" aria-label="Drawing canvas workspace">
+    <div className="paper"><DrawingCanvas strokes={history.strokes} color={color} size={size} tool={tool} onStroke={(stroke) => setHistory((current) => addStroke(current, stroke))}/></div>
+    <button ref={homeRef} className="back-button floating-home" aria-label="Home" onClick={onHome}><Icon name="back"/></button>
+    <FloatingToolbar homeRef={homeRef} colorCount={colors.length} toolCount={5 + sizes.length} colors={<div className="color-grid">{colors.map((item) => <button key={item.value} className={`color-button ${color === item.value && tool === 'brush' ? 'active' : ''}`} style={{ '--swatch': item.value } as React.CSSProperties} aria-label={item.name} aria-pressed={color === item.value && tool === 'brush'} onClick={() => { setColor(item.value); setTool('brush') }}><span/></button>)}</div>}>
+      <div className="tool-grid">
+        <button className={`tool-button ${tool === 'brush' ? 'selected' : ''}`} onClick={() => setTool('brush')} aria-pressed={tool === 'brush'} aria-label="Brush"><Icon name="brush"/></button>
+        <button className={`tool-button ${tool === 'eraser' ? 'selected' : ''}`} onClick={() => setTool('eraser')} aria-pressed={tool === 'eraser'} aria-label="Eraser"><Icon name="eraser"/></button>
+        <button className="tool-button" disabled={!history.strokes.length} onClick={() => setHistory(undo)} aria-label="Undo"><Icon name="undo"/></button>
+        <button className="tool-button" disabled={!history.undone.length} onClick={() => setHistory(redo)} aria-label="Redo"><Icon name="redo"/></button>
+        {sizes.map((item, index) => <button key={item.name} className={`size-button ${size === item.value ? 'active' : ''}`} aria-label={`${item.name} brush size`} aria-pressed={size === item.value} onClick={() => setSize(item.value)}><span style={{ width: 7 + index * 5, height: 7 + index * 5 }}/></button>)}
+        <button className="tool-button clear-button" disabled={!history.strokes.length} onClick={() => setConfirmClear(true)} aria-label="Clear page"><Icon name="trash"/></button>
       </div>
-      <div className="workspace-foot"><span>Every little line is a big idea.</span><span>✦</span></div>
-    </main>
+    </FloatingToolbar>
     {confirmClear && <ClearDialog onCancel={() => setConfirmClear(false)} onConfirm={() => { setHistory(emptyHistory()); setConfirmClear(false) }}/>}
-  </div>
+  </main>
 }
 
 export default function App() {
