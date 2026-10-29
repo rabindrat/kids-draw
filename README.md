@@ -1,6 +1,6 @@
 # Little Lines
 
-A small, child-friendly drawing app built with React, TypeScript, and Vite. This first milestone focuses on a usable drawing surface; letter practice is planned, not yet implemented.
+A child-friendly drawing, alphabet, and word practice app built with React, TypeScript, and Vite.
 
 ## Get started
 
@@ -27,6 +27,12 @@ The drawing surface fills the screen. The drawing tools start at the bottom left
 
 Finger, stylus, and mouse input are accepted. One pointer is accepted at a time; the app does not currently distinguish a palm from a finger or implement palm rejection. Interrupted strokes are retained. Pointer moves redraw the canvas without triggering React updates for each point.
 
+Alphabet practice presents A–Z in uppercase and lowercase. Children trace each dotted guide; a forgiving proximity and coverage check shows a celebration and moves to the next unfinished letter, wrapping around if needed. The letter menu in the top right shows completion for uppercase and lowercase separately and lets children choose any letter, including ones they have already practiced. The path matching is practice feedback, not an assessment of handwriting ability; stroke order and animated demonstrations are not yet implemented.
+
+Practice has two levels: letters and a starter set of 12 short common words. The level selector lets children switch at any time, and finishing the letter level also offers a button to try words. Each level's picker allows revisiting completed activities or jumping ahead.
+
+Completion and the next activity are stored separately for each level in IndexedDB. Progress remains on the same browser and device across reloads, but browser data can be cleared or evicted. If storage fails, the app shows a warning and practice continues for the current session. In-progress strokes are not saved. The word list order is part of the local progress format and should remain stable when adding more words.
+
 **Drawings are currently held in memory only.** Returning home preserves the current drawing while the page stays open, but refresh, closing the tab, or a browser crash will lose it. Saving, a gallery, backup, and offline/PWA support are future milestones. Browser storage is not the same as native app storage and can be cleared or evicted; a future backup feature will be important before relying on local storage for artwork.
 
 ## iPad testing
@@ -35,4 +41,4 @@ Start the dev server and open its network URL on an iPad on the same network. Te
 
 ## Next milestones
 
-See [TASKS.md](TASKS.md) for the phased backlog. Persistence and backup come before a full tracing system; native packaging follows a stable web experience.
+See [TASKS.md](TASKS.md) for the phased backlog. Artwork saving and backup, offline support, and real-device testing remain future milestones; native packaging follows a stable web experience.

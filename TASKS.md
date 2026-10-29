@@ -18,12 +18,20 @@
 
 ## Alphabet practice
 
-- [ ] Define normalized letter templates with stroke order and starting points.
-- [ ] Build a tracing activity, animated demonstrations, forgiving feedback, and retry/completion states.
-- [ ] Validate a small initial set of letters before expanding.
+- [x] Add normalized uppercase and lowercase templates for A–Z.
+- [x] Add tracing, forgiving geometric feedback, retry, celebration, and sequential advancement.
+- [x] Save alphabet progress locally in IndexedDB and restore it on reopening.
+- [ ] Add stroke-order indicators and animated demonstrations.
+- [ ] Validate the letter guides and feedback with children on a real iPad.
+
+## Word practice
+
+- [x] Add a second practice level with short words and a word picker.
+- [x] Track word progress separately from alphabet progress in IndexedDB.
+- [ ] Validate word guides and matching with children on a real iPad.
 
 ## Offline and native
 
-- [ ] Add local progress, a PWA manifest, and a service worker; verify offline startup and recovery.
+- [ ] Add a PWA manifest and a service worker; verify offline startup and recovery.
 - [ ] Conduct family usability sessions.
 - [ ] Consider Capacitor and native storage testing after the web experience is stable.

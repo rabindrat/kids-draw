@@ -1,0 +1,31 @@
+export type LetterTemplate = { letter: string; uppercase: string[]; lowercase: string[] }
+
+// Paths share a 100 × 100 coordinate system; separate paths represent pen lifts.
+export const alphabet: LetterTemplate[] = [
+  { letter: 'A', uppercase: ['M 18 82 L 50 15 L 82 82', 'M 30 58 L 70 58'], lowercase: ['M 73 40 C 65 32 45 32 34 42 C 22 53 25 73 38 79 C 52 86 66 78 73 68', 'M 73 37 L 73 82'] },
+  { letter: 'B', uppercase: ['M 25 82 L 25 16 L 52 16 C 76 16 79 43 52 47 L 25 47', 'M 52 47 C 80 47 81 82 52 82 L 25 82'], lowercase: ['M 27 15 L 27 82', 'M 27 50 C 32 38 45 34 57 37 C 73 40 79 53 74 67 C 69 83 43 86 27 73'] },
+  { letter: 'C', uppercase: ['M 79 25 C 65 10 40 10 26 25 C 11 41 13 65 27 78 C 41 91 66 88 79 74'], lowercase: ['M 73 44 C 60 31 39 34 30 47 C 20 61 28 78 43 81 C 54 84 65 81 73 73'] },
+  { letter: 'D', uppercase: ['M 23 82 L 23 16 L 43 16 C 70 16 82 29 82 49 C 82 69 70 82 43 82 L 23 82'], lowercase: ['M 73 15 L 73 82', 'M 73 49 C 66 37 53 33 41 37 C 25 41 21 57 27 69 C 34 84 58 86 73 73'] },
+  { letter: 'E', uppercase: ['M 76 16 L 25 16 L 25 82 L 76 82', 'M 25 48 L 66 48'], lowercase: ['M 26 58 L 73 58 C 73 43 64 35 51 35 C 36 35 26 45 26 59 C 26 73 37 82 51 82 C 62 82 69 78 75 72'] },
+  { letter: 'F', uppercase: ['M 25 82 L 25 16 L 77 16', 'M 25 48 L 66 48'], lowercase: ['M 38 82 L 38 32 C 38 20 44 15 55 15 C 60 15 64 17 67 19', 'M 24 42 L 61 42'] },
+  { letter: 'G', uppercase: ['M 78 25 C 64 10 39 11 26 26 C 12 41 13 65 27 78 C 41 91 67 87 79 75 L 79 53 L 57 53'], lowercase: ['M 73 38 L 73 77 C 73 94 59 98 43 94 C 36 92 31 90 27 87', 'M 73 49 C 65 35 47 32 35 40 C 22 49 24 67 35 74 C 47 82 64 77 73 67'] },
+  { letter: 'H', uppercase: ['M 22 16 L 22 82', 'M 78 16 L 78 82', 'M 22 49 L 78 49'], lowercase: ['M 27 15 L 27 82', 'M 27 52 C 31 42 40 36 51 36 C 66 36 73 46 73 59 L 73 82'] },
+  { letter: 'I', uppercase: ['M 27 16 L 73 16', 'M 50 16 L 50 82', 'M 27 82 L 73 82'], lowercase: ['M 50 19 L 50 21', 'M 50 39 L 50 82'] },
+  { letter: 'J', uppercase: ['M 27 16 L 75 16', 'M 61 16 L 61 65 C 61 81 50 87 37 83 C 29 81 25 76 23 69'], lowercase: ['M 60 19 L 60 21', 'M 60 39 L 60 79 C 60 90 55 95 45 95 C 40 95 36 93 33 90'] },
+  { letter: 'K', uppercase: ['M 25 16 L 25 82', 'M 77 16 L 25 53', 'M 44 40 L 80 82'], lowercase: ['M 28 15 L 28 82', 'M 72 37 L 28 64', 'M 47 52 L 76 82'] },
+  { letter: 'L', uppercase: ['M 25 16 L 25 82 L 77 82'], lowercase: ['M 50 15 L 50 75 C 50 81 54 83 60 81'] },
+  { letter: 'M', uppercase: ['M 17 82 L 17 16 L 50 56 L 83 16 L 83 82'], lowercase: ['M 15 38 L 15 82', 'M 15 52 C 19 41 26 36 34 36 C 44 36 48 44 48 54 L 48 82', 'M 48 52 C 52 41 58 36 67 36 C 77 36 82 44 82 54 L 82 82'] },
+  { letter: 'N', uppercase: ['M 20 82 L 20 16 L 80 82 L 80 16'], lowercase: ['M 26 37 L 26 82', 'M 26 52 C 30 41 39 36 50 36 C 65 36 73 46 73 58 L 73 82'] },
+  { letter: 'O', uppercase: ['M 50 14 C 29 14 17 29 17 49 C 17 69 29 84 50 84 C 71 84 83 69 83 49 C 83 29 71 14 50 14'], lowercase: ['M 50 35 C 35 35 25 45 25 59 C 25 73 35 82 50 82 C 65 82 75 73 75 59 C 75 45 65 35 50 35'] },
+  { letter: 'P', uppercase: ['M 25 82 L 25 16 L 52 16 C 78 16 79 49 52 49 L 25 49'], lowercase: ['M 27 37 L 27 96', 'M 27 49 C 34 37 47 33 59 37 C 74 42 78 56 73 68 C 67 82 43 84 27 72'] },
+  { letter: 'Q', uppercase: ['M 50 14 C 29 14 17 29 17 49 C 17 69 29 84 50 84 C 71 84 83 69 83 49 C 83 29 71 14 50 14', 'M 59 68 L 83 88'], lowercase: ['M 73 37 L 73 96', 'M 73 49 C 66 37 53 33 41 37 C 26 42 22 56 27 68 C 33 82 57 84 73 72'] },
+  { letter: 'R', uppercase: ['M 25 82 L 25 16 L 52 16 C 77 16 78 48 52 48 L 25 48', 'M 50 48 L 79 82'], lowercase: ['M 29 37 L 29 82', 'M 29 53 C 34 40 44 35 55 36 C 61 36 66 38 70 41'] },
+  { letter: 'S', uppercase: ['M 77 24 C 66 12 44 11 32 18 C 17 27 20 43 38 47 L 60 52 C 80 56 81 72 69 80 C 55 89 33 86 21 75'], lowercase: ['M 72 43 C 62 34 45 33 34 39 C 24 45 27 55 39 58 L 60 62 C 76 66 75 76 64 80 C 52 85 36 81 27 74'] },
+  { letter: 'T', uppercase: ['M 17 16 L 83 16', 'M 50 16 L 50 82'], lowercase: ['M 45 20 L 45 70 C 45 80 50 83 58 82 C 62 82 66 80 69 78', 'M 28 40 L 66 40'] },
+  { letter: 'U', uppercase: ['M 20 16 L 20 59 C 20 76 31 84 50 84 C 69 84 80 76 80 59 L 80 16'], lowercase: ['M 26 37 L 26 61 C 26 75 34 82 47 82 C 59 82 68 76 73 66', 'M 73 37 L 73 82'] },
+  { letter: 'V', uppercase: ['M 17 16 L 50 82 L 83 16'], lowercase: ['M 24 37 L 50 82 L 76 37'] },
+  { letter: 'W', uppercase: ['M 12 16 L 29 82 L 50 40 L 71 82 L 88 16'], lowercase: ['M 14 37 L 29 82 L 50 49 L 71 82 L 86 37'] },
+  { letter: 'X', uppercase: ['M 21 16 L 79 82', 'M 79 16 L 21 82'], lowercase: ['M 27 37 L 73 82', 'M 73 37 L 27 82'] },
+  { letter: 'Y', uppercase: ['M 18 16 L 50 48 L 82 16', 'M 50 48 L 50 82'], lowercase: ['M 24 37 L 49 80', 'M 76 37 L 45 96'] },
+  { letter: 'Z', uppercase: ['M 21 16 L 79 16 L 21 82 L 79 82'], lowercase: ['M 27 37 L 73 37 L 27 82 L 73 82'] },
+]
