@@ -3,6 +3,9 @@ export type Stroke = { points: Point[]; color: string; width: number; tool: 'bru
 export type History = { strokes: Stroke[]; undone: Stroke[] }
 
 export const emptyHistory = (): History => ({ strokes: [], undone: [] })
+export function hasBrushStrokes(history: History): boolean {
+  return history.strokes.some((stroke) => stroke.tool === 'brush')
+}
 export function addStroke(history: History, stroke: Stroke): History {
   if (!stroke.points.length) return history
   return { strokes: [...history.strokes, stroke], undone: [] }

@@ -1,9 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { addStroke, emptyHistory, normalizePoint, redo, undo, type Stroke } from './drawing'
+import { addStroke, emptyHistory, hasBrushStrokes, normalizePoint, redo, undo, type Stroke } from './drawing'
 
 const stroke = (x: number): Stroke => ({ points: [{ x, y: 0.5 }], color: '#123456', width: 0.02, tool: 'brush' })
 
 describe('drawing history', () => {
+  it('enables erasing only while the current history has a brush stroke', () => {
+    const drawn = addStroke(emptyHistory(), stroke(0.1))
+    const erased = addStroke(drawn, { ...stroke(0.1), tool: 'eraser' })
+    expect(hasBrushStrokes(emptyHistory())).toBe(false)
+    expect(hasBrushStrokes(erased)).toBe(true)
+    const undone = undo(undo(erased))
+    expect(hasBrushStrokes(undone)).toBe(false)
+    expect(hasBrushStrokes(redo(undone))).toBe(true)
+  })
   it('undoes and redoes completed strokes in order', () => {
     const history = addStroke(addStroke(emptyHistory(), stroke(0.1)), stroke(0.2))
     const undone = undo(undo(history))

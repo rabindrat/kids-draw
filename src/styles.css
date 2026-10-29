@@ -4,82 +4,30 @@
 @media(max-width:800px){.site-header{height:70px}.header-note,.workspace-label{display:none}.welcome{min-height:0}.welcome h1{font-size:clamp(38px,6vw,52px)}.home-art{max-width:400px}.activity-card{padding:18px 12px}.card-illustration{min-width:125px;width:37%;transform:scale(.85);transform-origin:left center}.card-copy strong{font-size:22px}.drawing-area{grid-template-columns:150px minmax(0,1fr);gap:10px}.toolbar{padding:15px 10px}.paper{min-height:420px}.workspace-doodle{display:none}}
 @media(max-width:560px){.site-header,.workspace-header{padding-left:20px;padding-right:20px}.home-main{padding:0 20px}.welcome{display:flex;flex-direction:column;align-items:stretch}.welcome-copy{padding:48px 0 0}.welcome h1{font-size:43px}.home-art{max-width:340px;align-self:center;margin:-15px 0 -12px}.hand-note{margin-top:18px}.activities{padding:0 0 35px}.section-heading h2{font-size:25px}.activity-grid{grid-template-columns:1fr;gap:12px}.activity-card{min-height:180px}.card-illustration{width:40%;min-width:135px}.home-footer{padding:18px 20px}.home-footer span:last-child{display:none}.workspace-main{padding:23px 12px}.workspace-heading{padding:0 7px}.workspace-heading h1{font-size:33px}.drawing-area{display:flex;flex-direction:column-reverse}.paper-wrap{padding:0 10px}.paper{min-height:55vh}.paper-top,.paper-bottom{height:35px;font-size:8px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;padding:12px}.tool-section{border:0;padding:0;margin:0}.tool-label{font-size:8px;margin-bottom:5px}.tool-button{min-height:46px;min-width:49px;font-size:9px}.tool-button svg{width:18px;height:18px}.color-grid{grid-template-columns:repeat(4,27px);gap:0}.color-button{width:27px;height:27px}.color-button span{width:19px;height:19px}.size-row{gap:3px}.size-button{width:31px;height:46px}.history-section{margin:0}.clear-button{align-self:end;padding:10px 3px}.workspace-header .brand{font-size:18px}.workspace-foot{padding:0 5px}}
 
-/* The drawing surface stays behind the floating controls at every viewport size. */
+/* The canvas fills the viewport; the two palettes leave its center clear. */
 .workspace{position:fixed;inset:0;width:100%;height:100dvh;min-height:0;overflow:hidden;background:#fff}
 .workspace .paper{position:absolute;inset:0;min-height:0;border:0;border-radius:0;background-color:#fffefb;background-image:radial-gradient(#e9ece4 1px,transparent 1px);background-size:28px 28px}
-.floating-home{position:absolute;z-index:2;top:max(16px,env(safe-area-inset-top));left:max(16px,env(safe-area-inset-left));min-height:48px;padding:0 17px;border:1px solid #e5e9df;border-radius:14px;background:#fffefa;color:#607a68;box-shadow:0 5px 24px #52664f18}
-.floating-home:hover{background:#f4f8f1}
-.floating-toolbar{position:fixed;z-index:3;top:20px;right:20px;width:208px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);display:flex;flex-direction:column;overflow:hidden;border:1px solid #e4e9df;border-radius:17px;background:#fffefa;box-shadow:0 10px 38px #53644f20,0 2px 8px #53644f0b}
-.toolbar-header{display:flex;align-items:center;min-height:54px;padding:5px 7px 5px 11px;flex:none}
-.toolbar-handle{display:flex;align-items:center;gap:8px;flex:1;min-width:0;min-height:44px;padding:0;border:0;background:none;color:#526b59;font:800 13px Nunito,sans-serif;text-align:left;cursor:grab;touch-action:none;user-select:none}
-.toolbar-handle:active{cursor:grabbing}.grip-dots{font-size:25px;line-height:1;color:#aab9a9}
-.toolbar-toggle{display:grid;place-items:center;flex:none;width:40px;height:40px;padding:0;border:0;border-radius:11px;background:#f2f5ee;color:#698271;cursor:pointer}
-.toolbar-toggle:hover{background:#e6eee2}.toolbar-toggle svg{width:19px;height:19px}
-.toolbar-content{overflow-y:auto;overscroll-behavior:contain;padding:0 15px 15px}
-.toolbar-content[hidden]{display:none}
-.floating-toolbar .tool-section{padding:14px 0;margin:0;border-top:1px solid #edf0e9;border-bottom:0}
-.floating-toolbar .tool-label{margin:0 0 10px 2px}
-.floating-toolbar .tool-button{min-height:55px;min-width:0}
-.floating-toolbar .color-grid{grid-template-columns:repeat(4,1fr);gap:5px}
-.floating-toolbar .color-button{width:39px;height:39px;padding:5px}
-.floating-toolbar .color-button span{width:26px;height:26px}
-.floating-toolbar .size-row{gap:7px}
-.floating-toolbar .size-button{flex:1;width:auto;height:42px}
-.floating-toolbar .clear-button{min-height:38px;padding:0 4px}
-.floating-toolbar.is-minimized{width:190px}
-@media(max-width:560px){.floating-home{top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left))}.floating-toolbar{width:190px}.floating-toolbar .color-button{width:35px;height:35px}.floating-toolbar .color-button span{width:24px;height:24px}.floating-toolbar .tool-section{padding:11px 0}.floating-toolbar .tool-button{min-height:49px}.floating-toolbar .size-button{height:38px}.floating-toolbar .clear-button{align-self:auto}}
-/* Keep navigation reachable even if the toolbar is moved into its corner. */
-.floating-home{z-index:4}
-.floating-toolbar{width:224px}
-.floating-toolbar .color-button{width:100%;height:44px}
-.floating-toolbar .size-button{height:44px}
-@media(max-width:560px){.floating-toolbar{width:224px}.floating-toolbar .color-button{width:100%;height:44px}.floating-toolbar .size-button{height:44px}}
-
-/* Keep the controls unobtrusive while retaining touch-sized targets. */
-.floating-home{display:grid;place-items:center;width:44px;height:44px;min-height:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:#526b59}
+.floating-home{position:absolute;z-index:4;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));display:grid;place-items:center;width:44px;height:44px;min-height:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:#526b59}
 .floating-home:hover{background:transparent}.floating-home svg{width:24px;height:24px}
-.floating-toolbar,.floating-toolbar.is-minimized{width:176px;max-height:calc(100dvh - 24px);padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
-.toolbar-header{justify-content:flex-end;min-height:0;padding:0}
-.toolbar-handle,.toolbar-toggle{display:grid;place-items:center;flex:none;width:44px;height:44px;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#526b59}
-.toolbar-handle:hover,.toolbar-toggle:hover{background:transparent}.grip-dots{color:#526b59}
-.toolbar-content{padding:0;overflow-y:auto}.toolbar-content[hidden]{display:none}
-.floating-toolbar .color-grid,.tool-grid{display:grid;grid-template-columns:repeat(4,44px);gap:0}
-.floating-toolbar .color-button,.floating-toolbar .size-button,.floating-toolbar .tool-button{display:grid;place-items:center;flex:none;width:44px;height:44px;min-width:0;min-height:0;margin:0;padding:0;border:1px solid transparent;background:transparent;cursor:pointer}
-.floating-toolbar .color-button{border-radius:50%}.floating-toolbar .color-button span{width:26px;height:26px}
-.floating-toolbar .color-button.active{border-color:var(--swatch)}
-.floating-toolbar .tool-button,.floating-toolbar .size-button{border-radius:10px;color:#526b59}
-.floating-toolbar .tool-button.selected,.floating-toolbar .size-button.active{border-color:#86a88e;background:transparent}
-.floating-toolbar .tool-button svg{width:22px;height:22px}.floating-toolbar .size-button span{background:#526b59}
-.floating-toolbar .clear-button{align-self:auto;color:#b27870}
-.floating-toolbar{touch-action:none;user-select:none;cursor:grab}
-.floating-toolbar:active{cursor:grabbing}
-.floating-toolbar button:disabled{pointer-events:none}
-/* A single strip follows the nearest edge and wraps only when it needs more room. */
-.floating-toolbar,.floating-toolbar.is-minimized{display:grid;gap:0;max-width:none;max-height:none;overflow:visible}
-.floating-toolbar .color-grid,.floating-toolbar .toolbar-content:not([hidden]),.floating-toolbar .tool-grid{display:contents}
-.floating-toolbar .toolbar-content[hidden]{display:none}
-.floating-toolbar .toolbar-toggle{width:44px;height:44px}
-/* Colors stay against the chosen edge; the toggle remains fixed on the inner strip. */
-.floating-toolbar{display:flex;gap:0;overflow:visible;touch-action:auto}
-.floating-toolbar.edge-top{flex-direction:column}
-.floating-toolbar.edge-bottom{flex-direction:column-reverse}
-.floating-toolbar.edge-left{flex-direction:row}
-.floating-toolbar.edge-right{flex-direction:row-reverse}
-.floating-toolbar .toolbar-colors,.floating-toolbar .toolbar-actions{flex:none;min-width:0;min-height:0;overscroll-behavior:contain}
-.floating-toolbar .toolbar-colors,.floating-toolbar .toolbar-content{scrollbar-width:none;-ms-overflow-style:none}
-.floating-toolbar .toolbar-colors::-webkit-scrollbar,.floating-toolbar .toolbar-content::-webkit-scrollbar{display:none}
-.floating-toolbar .toolbar-actions{display:flex}
-.floating-toolbar .toolbar-content:not([hidden]){display:block;flex:1;min-width:0;min-height:0;padding:0}
-.floating-toolbar .toolbar-content[hidden]{display:none}
-.floating-toolbar .color-grid,.floating-toolbar .tool-grid{display:flex;gap:0;width:max-content;height:max-content}
-.floating-toolbar .toolbar-toggle{touch-action:none}
-.floating-toolbar.edge-top .toolbar-colors,.floating-toolbar.edge-bottom .toolbar-colors{width:100%;height:44px;overflow-x:auto;overflow-y:hidden}
-.floating-toolbar.edge-top .toolbar-actions,.floating-toolbar.edge-bottom .toolbar-actions{width:100%;height:44px;flex-direction:row}
-.floating-toolbar.edge-top .toolbar-content,.floating-toolbar.edge-bottom .toolbar-content{overflow-x:auto;overflow-y:hidden}
-.floating-toolbar.edge-left .toolbar-colors,.floating-toolbar.edge-right .toolbar-colors{width:44px;height:100%;overflow-x:hidden;overflow-y:auto}
-.floating-toolbar.edge-left .toolbar-actions,.floating-toolbar.edge-right .toolbar-actions{width:44px;height:100%;flex-direction:column}
-.floating-toolbar.edge-left .toolbar-content,.floating-toolbar.edge-right .toolbar-content{overflow-x:hidden;overflow-y:auto}
-.floating-toolbar.edge-left .color-grid,.floating-toolbar.edge-right .color-grid,.floating-toolbar.edge-left .tool-grid,.floating-toolbar.edge-right .tool-grid{flex-direction:column}
-.floating-toolbar .toolbar-colors[data-scrollable="false"],.floating-toolbar .toolbar-content[data-scrollable="false"]{touch-action:none}
-.floating-toolbar.edge-top [data-scrollable="true"],.floating-toolbar.edge-bottom [data-scrollable="true"]{touch-action:pan-x}
-.floating-toolbar.edge-left [data-scrollable="true"],.floating-toolbar.edge-right [data-scrollable="true"]{touch-action:pan-y}
+.palette-dock{position:absolute;z-index:3;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:flex-end;gap:8px;pointer-events:none}
+.dock-palette{display:flex;align-items:center;flex:0 1 auto;min-width:0;height:44px;pointer-events:auto;touch-action:auto}
+.dock-tools{max-width:calc(100% - 52px)}
+.dock-colors{flex-direction:row-reverse;max-width:calc(100% - 96px)}
+.dock-pinned,.dock-options{display:flex;flex:none;align-items:center;height:44px}
+.dock-options{flex:0 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none;touch-action:pan-x}
+.dock-options::-webkit-scrollbar{display:none}
+.dock-options[hidden]{display:none}
+.dock-colors .dock-options{flex-direction:row-reverse}
+.dock-palette .color-button,.dock-palette .size-button,.dock-palette .tool-button{display:grid;place-items:center;flex:none;width:44px;height:44px;min-width:44px;min-height:44px;margin:0;padding:0;border:1px solid transparent;background:transparent;cursor:pointer}
+.dock-palette .color-button{border-radius:50%}.dock-palette .color-button span{width:26px;height:26px}
+.dock-palette .color-button.active{border-color:var(--swatch)}
+.dock-palette .tool-button,.dock-palette .size-button{border-radius:10px;color:#526b59}
+.dock-palette .tool-button.selected,.dock-palette .size-button.active{border-color:#86a88e;background:transparent}
+.dock-palette .tool-button svg{width:22px;height:22px}.dock-palette .size-button span{background:#526b59}
+.dock-palette .clear-button{color:#b27870}.dock-palette button:disabled{cursor:not-allowed}
+/* Palettes open upward, with scrolling when the screen is too short. */
+.dock-palette{flex:0 0 auto;flex-direction:column-reverse;align-items:flex-start;height:auto;max-height:calc(100dvh - 80px);pointer-events:none}
+.dock-tools,.dock-colors{max-width:none}
+.dock-colors{align-items:flex-end}
+.dock-pinned,.dock-options{pointer-events:auto}
+.dock-options,.dock-colors .dock-options{flex:0 1 auto;flex-direction:column-reverse;width:44px;height:auto;min-height:0;overflow-x:hidden;overflow-y:auto;touch-action:pan-y}

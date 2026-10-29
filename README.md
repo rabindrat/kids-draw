@@ -23,7 +23,7 @@ npm run build
 
 `src/App.tsx` contains the home and drawing screens. `src/features/drawing/DrawingCanvas.tsx` handles Pointer Events and canvas resizing; `src/engine/drawing.ts` owns normalized stroke data, rendering, and history. Strokes are resolution-independent and remain editable in memory as the canvas resizes. A new stroke after undo clears the redo branch. Erasing is an editable stroke, so it can be undone. Clear removes all history after confirmation.
 
-The drawing surface fills the screen. Drag anywhere on the drawing tools to move them; they snap to the nearest edge. Tap a button to use it, or use minus and plus to minimize and expand the tools. Colors remain against the screen edge when minimized; the toggle stays in place on the inner strip. If space is limited, scroll along a strip to reach its remaining buttons. To move the palette with a keyboard, focus the drawing tools group and use the arrow keys.
+The drawing surface fills the screen. The drawing tools start at the bottom left and colors at the bottom right. Tap the selected tool or color to expand its palette vertically. The brush and eraser remain visible side by side; erasing becomes available after a brush stroke. Clear is in the expanded tools, asks for confirmation, and returns to the brush. On small screens, swipe along an open palette to reach the remaining options.
 
 Finger, stylus, and mouse input are accepted. One pointer is accepted at a time; the app does not currently distinguish a palm from a finger or implement palm rejection. Interrupted strokes are retained. Pointer moves redraw the canvas without triggering React updates for each point.
 

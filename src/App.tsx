@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from './components/Icon'
-import { addStroke, emptyHistory, redo, undo, type Stroke } from './engine/drawing'
+import { addStroke, emptyHistory, hasBrushStrokes, redo, undo, type Stroke } from './engine/drawing'
 import { DrawingCanvas } from './features/drawing/DrawingCanvas'
-import { FloatingToolbar } from './features/drawing/FloatingToolbar'
+import { DockPalette } from './features/drawing/DockPalette'
 
 const colors = [
   { name: 'Berry', value: '#d45f64' }, { name: 'Tangerine', value: '#efa35f' },
@@ -86,21 +86,26 @@ function Workspace({ history, setHistory, onHome }: { history: ReturnType<typeof
   const [size, setSize] = useState(sizes[1].value)
   const [tool, setTool] = useState<Stroke['tool']>('brush')
   const [confirmClear, setConfirmClear] = useState(false)
-  const homeRef = useRef<HTMLButtonElement>(null)
+  const [openPalette, setOpenPalette] = useState<'tools' | 'colors' | null>(null)
+  const currentColor = colors.find((item) => item.value === color) ?? colors[0]
+  const toolExpanded = openPalette === 'tools'
+  const colorExpanded = openPalette === 'colors'
+  const canErase = hasBrushStrokes(history)
   return <main className="workspace" aria-label="Drawing canvas workspace">
     <div className="paper"><DrawingCanvas strokes={history.strokes} color={color} size={size} tool={tool} onStroke={(stroke) => setHistory((current) => addStroke(current, stroke))}/></div>
-    <button ref={homeRef} className="back-button floating-home" aria-label="Home" onClick={onHome}><Icon name="back"/></button>
-    <FloatingToolbar homeRef={homeRef} colorCount={colors.length} toolCount={5 + sizes.length} colors={<div className="color-grid">{colors.map((item) => <button key={item.value} className={`color-button ${color === item.value && tool === 'brush' ? 'active' : ''}`} style={{ '--swatch': item.value } as React.CSSProperties} aria-label={item.name} aria-pressed={color === item.value && tool === 'brush'} onClick={() => { setColor(item.value); setTool('brush') }}><span/></button>)}</div>}>
-      <div className="tool-grid">
-        <button className={`tool-button ${tool === 'brush' ? 'selected' : ''}`} onClick={() => setTool('brush')} aria-pressed={tool === 'brush'} aria-label="Brush"><Icon name="brush"/></button>
-        <button className={`tool-button ${tool === 'eraser' ? 'selected' : ''}`} onClick={() => setTool('eraser')} aria-pressed={tool === 'eraser'} aria-label="Eraser"><Icon name="eraser"/></button>
-        <button className="tool-button" disabled={!history.strokes.length} onClick={() => setHistory(undo)} aria-label="Undo"><Icon name="undo"/></button>
+    <button className="back-button floating-home" aria-label="Home" onClick={onHome}><Icon name="back"/></button>
+    <div className="palette-dock">
+      <DockPalette side="tools" label="Drawing tools" expanded={toolExpanded} toggle={<button className="tool-button selected" aria-label={`${tool === 'brush' ? 'Brush' : 'Eraser'}; ${toolExpanded ? 'collapse' : 'expand'} drawing tools`} aria-expanded={toolExpanded} aria-controls="tools-options" onClick={() => setOpenPalette(toolExpanded ? null : 'tools')}><Icon name={tool}/></button>} pinned={<button className="tool-button" disabled={tool === 'brush' && !canErase} onClick={() => setTool(tool === 'brush' ? 'eraser' : 'brush')} aria-label={tool === 'brush' ? 'Eraser' : 'Brush'}><Icon name={tool === 'brush' ? 'eraser' : 'brush'}/></button>}>
+        <button className="tool-button" disabled={!history.strokes.length} onClick={() => { const next = undo(history); setHistory(next); if (!hasBrushStrokes(next)) setTool('brush') }} aria-label="Undo"><Icon name="undo"/></button>
         <button className="tool-button" disabled={!history.undone.length} onClick={() => setHistory(redo)} aria-label="Redo"><Icon name="redo"/></button>
         {sizes.map((item, index) => <button key={item.name} className={`size-button ${size === item.value ? 'active' : ''}`} aria-label={`${item.name} brush size`} aria-pressed={size === item.value} onClick={() => setSize(item.value)}><span style={{ width: 7 + index * 5, height: 7 + index * 5 }}/></button>)}
         <button className="tool-button clear-button" disabled={!history.strokes.length} onClick={() => setConfirmClear(true)} aria-label="Clear page"><Icon name="trash"/></button>
-      </div>
-    </FloatingToolbar>
-    {confirmClear && <ClearDialog onCancel={() => setConfirmClear(false)} onConfirm={() => { setHistory(emptyHistory()); setConfirmClear(false) }}/>}
+      </DockPalette>
+      <DockPalette side="colors" label="Colors" expanded={colorExpanded} toggle={<button className="color-button active" style={{ '--swatch': currentColor.value } as React.CSSProperties} aria-label={`${currentColor.name}; ${colorExpanded ? 'collapse' : 'expand'} colors`} aria-expanded={colorExpanded} aria-controls="colors-options" onClick={() => setOpenPalette(colorExpanded ? null : 'colors')}><span/></button>}>
+        {colors.filter((item) => item.value !== color).map((item) => <button key={item.value} className="color-button" style={{ '--swatch': item.value } as React.CSSProperties} aria-label={item.name} onClick={() => { setColor(item.value); setTool('brush'); setOpenPalette(null) }}><span/></button>)}
+      </DockPalette>
+    </div>
+    {confirmClear && <ClearDialog onCancel={() => setConfirmClear(false)} onConfirm={() => { setHistory(emptyHistory()); setTool('brush'); setConfirmClear(false) }}/>}
   </main>
 }
 
