@@ -4,6 +4,9 @@ import { addStroke, emptyHistory, hasBrushStrokes, redo, undo, type Stroke } fro
 import { DrawingCanvas } from './features/drawing/DrawingCanvas'
 import { DockPalette } from './features/drawing/DockPalette'
 import { Practice, type PracticeLevel } from './features/tracing/Practice'
+import { doodles } from './content/doodles'
+import { DoodleArt } from './features/drawing/DoodleArt'
+import { useDrawingLibrary } from './features/drawing/useDrawingLibrary'
 
 const colors = [
   { name: 'Berry', value: '#d45f64' }, { name: 'Tangerine', value: '#efa35f' },
@@ -82,18 +85,73 @@ function ClearDialog({ onCancel, onConfirm }: { onCancel: () => void; onConfirm:
   }}><div className="modal-icon"><Icon name="sparkle" /></div><h2 id="clear-title">A fresh page?</h2><p>This will clear your drawing so you can start something new.</p><div className="modal-actions"><button ref={cancelRef} onClick={onCancel}>Keep drawing</button><button ref={confirmRef} className="confirm-button" onClick={onConfirm}>Clear page</button></div></div></div>
 }
 
-function Workspace({ history, setHistory, onHome }: { history: ReturnType<typeof emptyHistory>; setHistory: React.Dispatch<React.SetStateAction<ReturnType<typeof emptyHistory>>>; onHome: () => void }) {
+function Workspace({ library, onHome }: { library: ReturnType<typeof useDrawingLibrary>; onHome: () => void }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const pickerRef = useRef<HTMLElement>(null)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const [color, setColor] = useState(colors[0].value)
   const [size, setSize] = useState(sizes[1].value)
   const [tool, setTool] = useState<Stroke['tool']>('brush')
   const [confirmClear, setConfirmClear] = useState(false)
   const [openPalette, setOpenPalette] = useState<'tools' | 'colors' | null>(null)
+  const { drawing, selectedId, status, loadError, update, retry } = library
+  const history = drawing?.history ?? emptyHistory()
+  const doodle = doodles.find((item) => item.id === selectedId)
+  const setHistory = (change: ReturnType<typeof emptyHistory> | ((current: ReturnType<typeof emptyHistory>) => ReturnType<typeof emptyHistory>)) => update((current) => ({ ...current, history: typeof change === 'function' ? change(current.history) : change }))
+  useEffect(() => {
+    if (!menuOpen) return
+    const menu = menuRef.current
+    let timer: ReturnType<typeof setTimeout>
+    const dismiss = () => {
+      if (pickerRef.current?.contains(document.activeElement)) menuButtonRef.current?.focus()
+      setMenuOpen(false)
+    }
+    const resetTimer = () => { clearTimeout(timer); timer = setTimeout(dismiss, 5000) }
+    const close = (event: PointerEvent) => { if (!menu?.contains(event.target as Node)) setMenuOpen(false) }
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') dismiss() }
+    resetTimer()
+    menu?.addEventListener('pointermove', resetTimer)
+    menu?.addEventListener('pointerdown', resetTimer)
+    menu?.addEventListener('keydown', resetTimer)
+    menu?.addEventListener('focusin', resetTimer)
+    menu?.addEventListener('wheel', resetTimer)
+    menu?.addEventListener('scroll', resetTimer, true)
+    document.addEventListener('pointerdown', close)
+    document.addEventListener('keydown', escape)
+    return () => {
+      clearTimeout(timer)
+      menu?.removeEventListener('pointermove', resetTimer)
+      menu?.removeEventListener('pointerdown', resetTimer)
+      menu?.removeEventListener('keydown', resetTimer)
+      menu?.removeEventListener('focusin', resetTimer)
+      menu?.removeEventListener('wheel', resetTimer)
+      menu?.removeEventListener('scroll', resetTimer, true)
+      document.removeEventListener('pointerdown', close)
+      document.removeEventListener('keydown', escape)
+    }
+  }, [menuOpen])
   const currentColor = colors.find((item) => item.value === color) ?? colors[0]
   const toolExpanded = openPalette === 'tools'
   const colorExpanded = openPalette === 'colors'
   const canErase = hasBrushStrokes(history)
   return <main className="workspace" aria-label="Drawing canvas workspace">
-    <div className="paper"><DrawingCanvas strokes={history.strokes} color={color} size={size} tool={tool} onStroke={(stroke) => setHistory((current) => addStroke(current, stroke))} /></div>
+    <div className="paper">{doodle && drawing && <DoodleArt doodle={doodle} className="doodle-guide" opacity={drawing.opacity} />}{drawing && <DrawingCanvas key={selectedId} guided={!!doodle} strokes={history.strokes} color={color} size={size} tool={tool} onStroke={(stroke) => setHistory((current) => addStroke(current, stroke))} />}</div>
+    <div className="drawing-selector" ref={menuRef}>
+      <button ref={menuButtonRef} className="drawing-selector-toggle" aria-label="Choose a drawing" aria-expanded={menuOpen} aria-controls="drawing-picker" onClick={() => setMenuOpen(!menuOpen)}><span>{doodle ? doodle.name : 'Free draw'}</span><span aria-hidden="true">⌄</span></button>
+      <nav ref={pickerRef} id="drawing-picker" className={`drawing-picker ${menuOpen ? 'is-open' : ''}`} aria-label="Choose a drawing" aria-hidden={!menuOpen} inert={!menuOpen}>
+        <div className="drawing-picker-heading"><span>YOUR DRAWINGS</span><strong>Pick a page<span>.</span></strong></div>
+        <div className="drawing-picker-scroll">
+          <div className="drawing-level-label">LEVEL 0 · FREEHAND</div>
+          <button className={`drawing-choice freehand-choice ${selectedId === 'freehand' ? 'active' : ''}`} aria-pressed={selectedId === 'freehand'} onClick={() => { library.select('freehand'); setTool('brush'); setMenuOpen(false) }}><span className="freehand-symbol" aria-hidden="true">✎</span><span>Free draw</span></button>
+          <div className="drawing-level-label">LEVEL 1 · DOODLES</div>
+          <div className="doodle-grid">{doodles.map((item) => <button key={item.id} className={`drawing-choice ${selectedId === item.id ? 'active' : ''}`} aria-pressed={selectedId === item.id} onClick={() => { library.select(item.id); setTool('brush'); setMenuOpen(false) }}><DoodleArt doodle={item} /><span>{item.name}</span></button>)}</div>
+        </div>
+      </nav>
+    </div>
+    {doodle && drawing && <label className="doodle-opacity"><span>Guide</span><input type="range" min="0" max="100" step="5" value={Math.round(drawing.opacity * 100)} aria-label="Guide opacity" onChange={(event) => update((current) => ({ ...current, opacity: Number(event.target.value) / 100 }))} /><span>{Math.round(drawing.opacity * 100)}%</span></label>}
+    {(loadError || status === 'error') && <div className="drawing-storage-message" role="alert"><span>{loadError ? "Couldn't open this drawing." : "Couldn't save. Your drawing is still in this tab."}</span><button onClick={retry}>Try again</button></div>}
+    {!drawing && !loadError && <div className="drawing-loading" role="status">Opening your drawing…</div>}
     <button className="back-button floating-home" aria-label="Home" onClick={onHome}><Icon name="back" /></button>
     <div className="palette-dock">
       <DockPalette side="tools" label="Drawing tools" expanded={toolExpanded} toggle={<button className="tool-button selected" aria-label={`${tool === 'brush' ? 'Brush' : 'Eraser'}; ${toolExpanded ? 'collapse' : 'expand'} drawing tools`} aria-expanded={toolExpanded} aria-controls="tools-options" onClick={() => setOpenPalette(toolExpanded ? null : 'tools')}><Icon name={tool} /></button>} pinned={<button className="tool-button" disabled={tool === 'brush' && !canErase} onClick={() => setTool(tool === 'brush' ? 'eraser' : 'brush')} aria-label={tool === 'brush' ? 'Eraser' : 'Brush'}><Icon name={tool === 'brush' ? 'eraser' : 'brush'} /></button>}>
@@ -112,9 +170,9 @@ function Workspace({ history, setHistory, onHome }: { history: ReturnType<typeof
 
 export default function App() {
   const [screen, setScreen] = useState<'home' | 'draw' | 'practice'>('home')
-  const [history, setHistory] = useState(emptyHistory)
+  const library = useDrawingLibrary(screen === 'draw')
   const [practiceLevel, setPracticeLevel] = useState<PracticeLevel>('letters')
   if (screen === 'home') return <Home onDraw={() => setScreen('draw')} onPractice={() => setScreen('practice')} />
   if (screen === 'practice') return <Practice key={practiceLevel} level={practiceLevel} onLevelChange={setPracticeLevel} onHome={() => setScreen('home')} />
-  return <Workspace history={history} setHistory={setHistory} onHome={() => setScreen('home')} />
+  return <Workspace library={library} onHome={() => setScreen('home')} />
 }

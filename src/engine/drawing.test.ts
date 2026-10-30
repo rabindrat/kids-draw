@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { addStroke, emptyHistory, hasBrushStrokes, normalizePoint, redo, undo, type Stroke } from './drawing'
+import { addStroke, emptyHistory, hasBrushStrokes, normalizeGuidePoint, normalizePoint, redo, undo, type Stroke } from './drawing'
 
 const stroke = (x: number): Stroke => ({ points: [{ x, y: 0.5 }], color: '#123456', width: 0.02, tool: 'brush' })
 
@@ -41,5 +41,17 @@ describe('coordinate normalization', () => {
     const rect = { left: 20, top: 10, width: 200, height: 100 }
     expect(normalizePoint(120, 35, rect)).toEqual({ x: 0.5, y: 0.25 })
     expect(normalizePoint(-10, 200, rect)).toEqual({ x: 0, y: 1 })
+  })
+})
+
+describe('doodle guide coordinates', () => {
+  it('keeps a point aligned with a centered guide across aspect ratios', () => {
+    const portrait = { left: 0, top: 0, width: 400, height: 800 }
+    const landscape = { left: 0, top: 0, width: 800, height: 400 }
+    const p = normalizeGuidePoint(200, 400, portrait)
+    const l = normalizeGuidePoint(400, 200, landscape)
+    expect(p).toEqual({ x: 0.5, y: 0.5 })
+    expect(l).toEqual(p)
+    expect(normalizeGuidePoint(0, 0, portrait).y).toBeLessThan(0)
   })
 })

@@ -76,3 +76,22 @@
 .next-level-button{display:flex;align-items:center;gap:8px;margin-top:18px;padding:10px 15px;border:0;border-radius:11px;background:#dfeee0;color:#587b61;font:800 13px Nunito,sans-serif;cursor:pointer;pointer-events:auto}.next-level-button svg{width:17px}
 @media(max-width:600px){.level-select-label{font-size:11px}.level-select select{font-size:14px}.trace-board.trace-board-word{height:min(var(--guide-vw),calc(100dvh - 200px),360px)}}
 @media(max-height:500px){.trace-board.trace-board-word{height:min(var(--guide-vw),calc(100dvh - 110px),360px)}}
+
+/* Drawing pages and reference guides */
+.doodle-guide{position:absolute;top:50%;left:50%;width:min(85vw,85dvh);height:min(85vw,85dvh);transform:translate(-50%,-50%);color:#607968;pointer-events:none}
+.drawing-selector{position:absolute;z-index:4;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right))}
+.drawing-selector-toggle{min-height:44px;display:flex;align-items:center;gap:12px;padding:0 15px;border:1px solid #e4ebe0;border-radius:14px;background:#fffefaed;color:#607c68;font:800 14px Nunito,sans-serif;cursor:pointer;box-shadow:0 3px 12px #526b5912}
+.drawing-selector-toggle span:last-child{font-size:20px;line-height:1}
+.drawing-picker{position:absolute;top:calc(100% + 8px);right:0;width:min(360px,calc(100vw - 24px));max-height:calc(100dvh - 85px);display:flex;flex-direction:column;overflow:hidden;background:#fffefa;border:1px solid #e8ece1;border-radius:20px;box-shadow:0 16px 45px #415b452b}
+.drawing-picker{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-8px) scale(.98);transform-origin:top right;transition:opacity .18s ease,transform .18s ease,visibility 0s linear .18s}.drawing-picker.is-open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1);transition-delay:0s}
+@media(prefers-reduced-motion:reduce){.drawing-picker{transition:none}}
+.drawing-picker-heading{display:flex;flex-direction:column;gap:5px;padding:19px 20px 0}.drawing-picker-heading>span,.drawing-level-label{font-size:9px;font-weight:700;letter-spacing:1.4px;color:#9bac9c}.drawing-picker-heading strong{font:900 23px/1.1 Nunito,sans-serif;color:#40584a}.drawing-picker-heading strong span{color:#d88b7e}
+.drawing-picker-scroll{overflow:auto;overscroll-behavior:contain;padding:0 14px 16px}.drawing-level-label{margin:18px 4px 9px}.doodle-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.drawing-choice{min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid transparent;border-radius:13px;background:#f5f7f0;color:#6c8872;font:800 13px Nunito,sans-serif;cursor:pointer}.drawing-choice.active{border-color:#a9c6ad;background:#eaf2e7}.drawing-choice svg{width:72px;height:64px}.freehand-choice{min-height:54px;width:100%;flex-direction:row;gap:10px}.freehand-symbol{font-size:26px;color:#d49782}
+.doodle-opacity{position:absolute;z-index:3;top:max(18px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;min-height:36px;padding:0 10px;border-radius:12px;background:#fffefaeb;color:#829486;font-size:11px;font-weight:700;white-space:nowrap}.doodle-opacity input{width:100px;accent-color:#8eaf96;cursor:pointer;touch-action:auto}
+.drawing-storage-message,.drawing-loading{position:absolute;z-index:4;left:50%;top:70px;transform:translateX(-50%);max-width:calc(100% - 24px);padding:10px 14px;border-radius:12px;background:#fff4e9;color:#826759;font-size:12px;box-shadow:0 4px 18px #526b5918}.drawing-storage-message{display:flex;align-items:center;gap:10px}.drawing-storage-message button{border:0;background:none;color:#6a8f72;font-weight:700;white-space:nowrap;cursor:pointer}
+@media(max-width:560px){.doodle-opacity{top:64px}.drawing-storage-message,.drawing-loading{top:110px}.drawing-picker{max-height:calc(100dvh - 75px)}}
+
+/* Keep iPad long presses and multi-touch from selecting the drawing surface. */
+.workspace,.trace-board{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.drawing-canvas{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}

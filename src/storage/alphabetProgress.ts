@@ -13,7 +13,7 @@ function normalizeProgress(value: unknown, count: number): AlphabetProgress {
 export const normalizeAlphabetProgress = (value: unknown): AlphabetProgress => normalizeProgress(value, 52)
 export const normalizeWordProgress = (value: unknown): AlphabetProgress => normalizeProgress(value, words.length)
 
-function openDatabase(): Promise<IDBDatabase> {
+export function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     if (typeof indexedDB === 'undefined') { reject(new Error('Local storage is unavailable')); return }
     const request = indexedDB.open('little-lines', 1)

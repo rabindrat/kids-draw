@@ -25,8 +25,19 @@ export function normalizePoint(clientX: number, clientY: number, rect: Pick<DOMR
   }
 }
 
-export function renderStrokes(ctx: CanvasRenderingContext2D, strokes: Stroke[], width: number, height: number): void {
+export function guideBounds(width: number, height: number) {
+  const side = Math.min(width, height) * 0.85
+  return { left: (width - side) / 2, top: (height - side) / 2, width: side, height: side }
+}
+
+export function normalizeGuidePoint(clientX: number, clientY: number, rect: Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>): Point {
+  const bounds = guideBounds(rect.width, rect.height)
+  return { x: (clientX - rect.left - bounds.left) / (bounds.width || 1), y: (clientY - rect.top - bounds.top) / (bounds.height || 1) }
+}
+
+export function renderStrokes(ctx: CanvasRenderingContext2D, strokes: Stroke[], width: number, height: number, guided = false): void {
   ctx.clearRect(0, 0, width, height)
+  const bounds = guided ? guideBounds(width, height) : { left: 0, top: 0, width, height }
   for (const stroke of strokes) {
     if (!stroke.points.length) continue
     ctx.save()
@@ -39,11 +50,11 @@ export function renderStrokes(ctx: CanvasRenderingContext2D, strokes: Stroke[], 
     const first = stroke.points[0]
     ctx.beginPath()
     if (stroke.points.length === 1) {
-      ctx.arc(first.x * width, first.y * height, ctx.lineWidth / 2, 0, Math.PI * 2)
+      ctx.arc(bounds.left + first.x * bounds.width, bounds.top + first.y * bounds.height, ctx.lineWidth / 2, 0, Math.PI * 2)
       ctx.fill()
     } else {
-      ctx.moveTo(first.x * width, first.y * height)
-      for (const point of stroke.points.slice(1)) ctx.lineTo(point.x * width, point.y * height)
+      ctx.moveTo(bounds.left + first.x * bounds.width, bounds.top + first.y * bounds.height)
+      for (const point of stroke.points.slice(1)) ctx.lineTo(bounds.left + point.x * bounds.width, bounds.top + point.y * bounds.height)
       ctx.stroke()
     }
     ctx.restore()
