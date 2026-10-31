@@ -12,6 +12,7 @@ function normalizeProgress(value: unknown, count: number): AlphabetProgress {
 }
 export const normalizeAlphabetProgress = (value: unknown): AlphabetProgress => normalizeProgress(value, 52)
 export const normalizeWordProgress = (value: unknown): AlphabetProgress => normalizeProgress(value, words.length)
+export const normalizeDigitProgress = (value: unknown): AlphabetProgress => normalizeProgress(value, 10)
 
 export function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -67,3 +68,5 @@ export const loadAlphabetProgress = () => loadAfterWrites('alphabet', normalizeA
 export const saveAlphabetProgress = (progress: AlphabetProgress) => queueSave('alphabet', progress, normalizeAlphabetProgress)
 export const loadWordProgress = () => loadAfterWrites('words', normalizeWordProgress)
 export const saveWordProgress = (progress: AlphabetProgress) => queueSave('words', progress, normalizeWordProgress)
+export const loadDigitProgress = () => loadAfterWrites('digits', normalizeDigitProgress)
+export const saveDigitProgress = (progress: AlphabetProgress) => queueSave('digits', progress, normalizeDigitProgress)

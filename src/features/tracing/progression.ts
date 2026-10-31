@@ -7,3 +7,8 @@ export function nextIncompleteStep(currentIndex: number, completed: number[], to
   }
   return null
 }
+
+// Restart at a chosen item: preserve earlier progress and practice forward from here again.
+export function progressFromStep(completed: number[], step: number): number[] {
+  return completed.filter((completedStep) => completedStep < step)
+}

@@ -13,7 +13,7 @@
 .dock-palette{display:flex;align-items:center;flex:0 1 auto;min-width:0;height:44px;pointer-events:auto;touch-action:auto}
 .dock-tools{max-width:calc(100% - 52px)}
 .dock-colors{flex-direction:row-reverse;max-width:calc(100% - 96px)}
-.dock-pinned,.dock-options{display:flex;flex:none;align-items:center;height:44px}
+.dock-pinned,.dock-options{display:flex;flex:none;align-items:center;height:44px}.dock-pinned{gap:2px}
 .dock-options{flex:0 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none;touch-action:pan-x}
 .dock-options::-webkit-scrollbar{display:none}
 .dock-options[hidden]{display:none}
@@ -24,6 +24,7 @@
 .dock-palette .tool-button,.dock-palette .size-button{border-radius:10px;color:#526b59}
 .dock-palette .tool-button.selected,.dock-palette .size-button.active{border-color:#86a88e;background:transparent}
 .dock-palette .tool-button svg{width:22px;height:22px}.dock-palette .size-button span{background:#526b59}
+.dock-palette .pen-tool{color:#547d5d;background:#e8f1e6}.dock-palette .pen-tool.active{color:#fff;background:#739b78;border-color:#739b78}.dock-palette .eraser-tool{color:#bd783e;background:#faeddd}.dock-palette .eraser-tool.active{color:#fff;background:#e39a55;border-color:#e39a55}.dock-palette .reset-tool{color:#9c7068}.dock-tools .dock-pinned{width:136px;justify-content:flex-start}
 .dock-palette .clear-button{color:#b27870}.dock-palette button:disabled{cursor:not-allowed}
 /* Palettes open upward, with scrolling when the screen is too short. */
 .dock-palette{flex:0 0 auto;flex-direction:column-reverse;align-items:flex-start;height:auto;max-height:calc(100dvh - 80px);pointer-events:none}
@@ -95,3 +96,20 @@
 /* Keep iPad long presses and multi-touch from selecting the drawing surface. */
 .workspace,.trace-board{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .drawing-canvas{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
+.digit-picker-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.digit-choice{position:relative;display:grid;place-items:center;min-width:0;min-height:52px;padding:0 20px 0 8px;border:1px solid transparent;border-radius:12px;background:#f5f7f0;color:#849887;font:900 21px Nunito,sans-serif;cursor:pointer}
+.digit-choice.active{border-color:#a9c7ad;background:#e6f0e4;color:#557c60}.digit-choice.done:not(.active){color:#65866b}.digit-choice .choice-status{right:5px;bottom:5px}
+.picker-reset{flex:none;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;margin:0 14px 14px;padding:0 12px;border:1px solid #eee5db;border-radius:12px;background:#fffaf4;color:#a87566;font:800 12px Nunito,sans-serif;cursor:pointer}.picker-reset svg{width:17px;height:17px}
+
+/* Prevent touch selection and long-press callouts throughout the app. */
+html,body,#root,#root *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+/* Letter examples below the tracing board. */
+.letter-example{width:min(340px,90vw);min-height:78px;flex:none;display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px;padding:6px 18px;border:1px solid #eee9dc;border-radius:18px;background:#fffefa}
+.letter-example-art{width:68px;height:64px;flex:none;display:grid;place-items:center;border-radius:50%;background:#f5f5ec;color:#607d68}
+.letter-example-art svg{width:57px;height:57px;overflow:visible}
+.letter-example-copy{display:flex;flex-direction:column;gap:4px;color:#40584a}
+.letter-example-copy span{font-size:8px;font-weight:800;letter-spacing:1.3px;color:#a2b09f}
+.letter-example-copy strong{font:900 16px/1.2 Nunito,sans-serif;color:#53745c}
+.practice-stage-letters .trace-board{width:min(62vw,calc(100dvh - 355px),400px)}
+@media(max-width:600px){.practice-stage-letters .trace-board{width:min(76vw,calc(100dvh - 330px),360px)}.letter-example{min-height:68px;margin-top:7px}.letter-example-art{width:56px;height:54px}.letter-example-art svg{width:49px;height:49px}.letter-example-copy strong{font-size:14px}}
+@media(max-height:500px){.practice-stage-letters{justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain}.practice-stage-letters .trace-board{width:min(52vw,calc(100dvh - 260px),280px)}.letter-example{min-height:58px;margin-top:5px}}
