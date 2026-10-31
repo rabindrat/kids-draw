@@ -1,5 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { Icon } from '../../components/Icon'
+import { MusicToggle } from '../../components/MusicToggle'
+import successSoundUrl from '../../assets/success.mp3'
 import { alphabet } from '../../content/alphabet'
 import { digits } from '../../content/digits'
 import { words } from '../../content/words'
@@ -33,7 +35,7 @@ function samplePaths(paths: SVGPathElement[], guides: GuidePath[], width: number
   })
 }
 
-export function Practice({ onHome, level, onLevelChange }: { onHome: () => void; level: PracticeLevel; onLevelChange: (level: PracticeLevel) => void }) {
+export function Practice({ onHome, level, onLevelChange, musicPlaying, onToggleMusic }: { onHome: () => void; level: PracticeLevel; onLevelChange: (level: PracticeLevel) => void; musicPlaying: boolean; onToggleMusic: () => void }) {
   const [progress, setProgress] = useState<AlphabetProgress>(emptyAlphabetProgress)
   const progressRef = useRef(progress)
   const [index, setIndex] = useState(0)
@@ -48,6 +50,7 @@ export function Practice({ onHome, level, onLevelChange }: { onHome: () => void;
   const guideRef = useRef<Point[][]>([])
   const finishedRef = useRef(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const successAudioRef = useRef<HTMLAudioElement>(null)
   const selectedRef = useRef<HTMLButtonElement | null>(null)
   const menuRef = useRef<HTMLElement | null>(null)
   const menuButtonRef = useRef<HTMLButtonElement | null>(null)
@@ -138,6 +141,10 @@ export function Practice({ onHome, level, onLevelChange }: { onHome: () => void;
     if (!evaluateTracing(nextHistory.strokes, guideRef.current, ratio).complete) return
     finishedRef.current = true
     setCelebrating(true)
+    if (level === 'letters' && successAudioRef.current) {
+      successAudioRef.current.currentTime = 0
+      void successAudioRef.current.play().catch(() => {})
+    }
     const completed = [...new Set([...progressRef.current.completed, index])]
     const nextIndex = nextIncompleteStep(index, completed, totalSteps)
     updateProgress({ completed, currentIndex: nextIndex ?? index })
@@ -156,10 +163,11 @@ export function Practice({ onHome, level, onLevelChange }: { onHome: () => void;
   const name = isWords ? 'word' : isDigits ? 'number' : 'letter'
   const activityPlural = isWords ? 'WORDS' : isDigits ? 'NUMBERS' : 'LETTERS'
   return <main className="practice-page" aria-label={`${isWords ? 'Word' : isDigits ? 'Digit' : 'Alphabet'} practice`}>
+    <audio ref={successAudioRef} src={successSoundUrl} preload="auto" hidden />
     <header className="practice-header">
       <button className="practice-home" aria-label="Home" onClick={onHome}><Icon name="back"/></button>
       <div className="practice-heading"><span className="practice-eyebrow">LITTLE LEARNING ADVENTURES</span><label className="level-select"><span className="level-select-label">Level</span><select aria-label="Practice level" value={level} onChange={(event) => onLevelChange(event.target.value as PracticeLevel)}><option value="letters">1 · Letters</option><option value="words">2 · Words</option><option value="digits">3 · Digits</option></select><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 8 5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></label></div>
-      <button ref={menuButtonRef} className="letter-menu-toggle" aria-label={`Choose a ${name}; ${progress.completed.length} of ${totalSteps} completed`} aria-expanded={menuOpen} aria-controls="activity-picker" disabled={loading} onClick={() => setMenuOpen((open) => !open)}><span className="menu-letters">{isWords ? 'abc' : isDigits ? '123' : 'Aa'}</span><span className="menu-progress">{progress.completed.length} / {totalSteps}</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 8 5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+      <div className="practice-header-actions"><MusicToggle playing={musicPlaying} onToggle={onToggleMusic}/><button ref={menuButtonRef} className="letter-menu-toggle" aria-label={`Choose a ${name}; ${progress.completed.length} of ${totalSteps} completed`} aria-expanded={menuOpen} aria-controls="activity-picker" disabled={loading} onClick={() => setMenuOpen((open) => !open)}><span className="menu-letters">{isWords ? 'abc' : isDigits ? '123' : 'Aa'}</span><span className="menu-progress">{progress.completed.length} / {totalSteps}</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 8 5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></button></div>
       {menuOpen && <nav ref={menuRef} id="activity-picker" className="letter-picker" aria-label={`Choose a ${name}`}>
         <div className="letter-picker-header"><div><span className="picker-eyebrow">YOUR {activityPlural}</span><h2>Pick a {name}<span>.</span></h2></div><span className="picker-count">✦ {progress.completed.length} / {totalSteps}</span></div>
         <div className="picker-legend"><span><i className="legend-done">✓</i> Done</span><span><i className="legend-todo"/> To try</span></div>

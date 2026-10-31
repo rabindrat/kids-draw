@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from './components/Icon'
+import { MusicToggle } from './components/MusicToggle'
+import bgMusicUrl from './assets/bg-music.mp3'
 import { addStroke, emptyHistory, hasBrushStrokes, redo, undo, type Stroke } from './engine/drawing'
-import { DrawingCanvas } from './features/drawing/DrawingCanvas'
+import { DrawingCanvas, type CanvasView } from './features/drawing/DrawingCanvas'
 import { DockPalette } from './features/drawing/DockPalette'
 import { Practice, type PracticeLevel } from './features/tracing/Practice'
 import { doodles } from './content/doodles'
@@ -39,9 +41,9 @@ function HomeArt() {
   </svg>
 }
 
-function Home({ onDraw, onPractice }: { onDraw: () => void; onPractice: () => void }) {
+function Home({ onDraw, onPractice, musicPlaying, onToggleMusic }: { onDraw: () => void; onPractice: () => void; musicPlaying: boolean; onToggleMusic: () => void }) {
   return <div className="home-page">
-    <header className="site-header"><Logo /><span className="header-note"><span className="tiny-sparkle">✳</span> MADE FOR LITTLE IMAGINATIONS</span></header>
+    <header className="site-header"><Logo /><div className="header-actions"><span className="header-note"><span className="tiny-sparkle">✳</span> MADE FOR LITTLE IMAGINATIONS</span><MusicToggle playing={musicPlaying} onToggle={onToggleMusic} labeled/></div></header>
     <main className="home-main">
       <section className="activities" aria-labelledby="activities-title">
         <div className="section-heading"><div><div className="eyebrow">PICK YOUR ADVENTURE</div><h2 id="activities-title">Let's make something.</h2></div><span className="section-sparkle">✳</span></div>
@@ -85,7 +87,8 @@ function ClearDialog({ onCancel, onConfirm }: { onCancel: () => void; onConfirm:
   }}><div className="modal-icon"><Icon name="sparkle" /></div><h2 id="clear-title">A fresh page?</h2><p>This will clear your drawing so you can start something new.</p><div className="modal-actions"><button ref={cancelRef} onClick={onCancel}>Keep drawing</button><button ref={confirmRef} className="confirm-button" onClick={onConfirm}>Clear page</button></div></div></div>
 }
 
-function Workspace({ library, onHome }: { library: ReturnType<typeof useDrawingLibrary>; onHome: () => void }) {
+function Workspace({ library, onHome, musicPlaying, onToggleMusic }: { library: ReturnType<typeof useDrawingLibrary>; onHome: () => void; musicPlaying: boolean; onToggleMusic: () => void }) {
+  const paperRef = useRef<HTMLDivElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const pickerRef = useRef<HTMLElement>(null)
@@ -93,6 +96,8 @@ function Workspace({ library, onHome }: { library: ReturnType<typeof useDrawingL
   const [color, setColor] = useState(colors[0].value)
   const [size, setSize] = useState(sizes[1].value)
   const [tool, setTool] = useState<Stroke['tool']>('brush')
+  const [view, setView] = useState<CanvasView>({ scale: 1, x: 0, y: 0 })
+  const [panMode, setPanMode] = useState(false)
   const [confirmClear, setConfirmClear] = useState(false)
   const [openPalette, setOpenPalette] = useState<'tools' | 'colors' | null>(null)
   const { drawing, selectedId, status, loadError, update, retry } = library
@@ -135,8 +140,19 @@ function Workspace({ library, onHome }: { library: ReturnType<typeof useDrawingL
   const toolExpanded = openPalette === 'tools'
   const colorExpanded = openPalette === 'colors'
   const canErase = hasBrushStrokes(history)
+  const zoom = (delta: number) => {
+    const bounds = paperRef.current?.getBoundingClientRect()
+    setView((current) => {
+      const scale = Math.max(0.5, Math.min(4, Math.round((current.scale + delta) * 100) / 100))
+      const maxX = bounds ? Math.max(0, (bounds.width * (scale - 1)) / 2) : Infinity
+      const maxY = bounds ? Math.max(0, (bounds.height * (scale - 1)) / 2) : Infinity
+      return { scale, x: Math.max(-maxX, Math.min(maxX, current.x)), y: Math.max(-maxY, Math.min(maxY, current.y)) }
+    })
+  }
+  const resetView = () => setView({ scale: 1, x: 0, y: 0 })
+  const isDefaultView = view.scale === 1 && view.x === 0 && view.y === 0
   return <main className="workspace" aria-label="Drawing canvas workspace">
-    <div className="paper">{doodle && drawing && <DoodleArt doodle={doodle} className="doodle-guide" opacity={drawing.opacity} />}{drawing && <DrawingCanvas key={selectedId} guided={!!doodle} strokes={history.strokes} color={color} size={tool === 'eraser' ? sizes[2].value : size} tool={tool} onStroke={(stroke) => setHistory((current) => addStroke(current, stroke))} />}</div>
+    <div className="paper" ref={paperRef}><div className="drawing-surface" style={{ transform: `translate3d(${view.x}px, ${view.y}px, 0) scale(${view.scale})` }}>{doodle && drawing && <DoodleArt doodle={doodle} className="doodle-guide" opacity={drawing.opacity} />}{drawing && <DrawingCanvas key={selectedId} guided={!!doodle} strokes={history.strokes} color={color} size={tool === 'eraser' ? sizes[2].value : size} tool={tool} view={view} panMode={panMode} onViewChange={setView} onStroke={(stroke) => setHistory((current) => addStroke(current, stroke))} />}</div></div>
     <div className="drawing-selector" ref={menuRef}>
       <button ref={menuButtonRef} className="drawing-selector-toggle" aria-label="Choose a drawing" aria-expanded={menuOpen} aria-controls="drawing-picker" onClick={() => setMenuOpen(!menuOpen)}><span>{doodle ? doodle.name : 'Free draw'}</span><span aria-hidden="true">⌄</span></button>
       <nav ref={pickerRef} id="drawing-picker" className={`drawing-picker ${menuOpen ? 'is-open' : ''}`} aria-label="Choose a drawing" aria-hidden={!menuOpen} inert={!menuOpen}>
@@ -153,6 +169,13 @@ function Workspace({ library, onHome }: { library: ReturnType<typeof useDrawingL
     {(loadError || status === 'error') && <div className="drawing-storage-message" role="alert"><span>{loadError ? "Couldn't open this drawing." : "Couldn't save. Your drawing is still in this tab."}</span><button onClick={retry}>Try again</button></div>}
     {!drawing && !loadError && <div className="drawing-loading" role="status">Opening your drawing…</div>}
     <button className="back-button floating-home" aria-label="Home" onClick={onHome}><Icon name="back" /></button>
+    <div className="canvas-zoom-controls" role="group" aria-label="Canvas view controls">
+      <button type="button" onClick={() => zoom(-0.25)} disabled={view.scale <= 0.5} aria-label="Zoom out">−</button>
+      <button type="button" className="zoom-reset" onClick={resetView} disabled={isDefaultView} aria-label="Reset zoom and position">{Math.round(view.scale * 100)}%</button>
+      <button type="button" onClick={() => zoom(0.25)} disabled={view.scale >= 4} aria-label="Zoom in">+</button>
+      <button type="button" className={`pan-mode-button ${panMode ? 'active' : ''}`} aria-pressed={panMode} aria-label={`${panMode ? 'Disable' : 'Enable'} hand tool for moving the canvas`} onClick={() => setPanMode((enabled) => !enabled)}><Icon name="hand" /></button>
+      <MusicToggle playing={musicPlaying} onToggle={onToggleMusic}/>
+    </div>
     <div className="palette-dock">
       <DockPalette side="tools" label="Drawing tools" expanded={toolExpanded} toggle={<button className={`tool-button pen-tool ${tool === 'brush' ? 'active' : ''}`} aria-label={`Pen${tool === 'brush' ? ', selected' : ''}; ${toolExpanded ? 'collapse' : 'show'} pen options`} aria-pressed={tool === 'brush'} aria-expanded={toolExpanded} aria-controls="tools-options" onClick={() => { setTool('brush'); setOpenPalette(toolExpanded ? null : 'tools') }}><Icon name="brush" /></button>} pinned={<>
         <button className={`tool-button eraser-tool ${tool === 'eraser' ? 'active' : ''}`} disabled={tool !== 'eraser' && !canErase} onClick={() => { setTool('eraser'); setOpenPalette(null) }} aria-label={`Eraser${tool === 'eraser' ? ', selected' : ''}`} aria-pressed={tool === 'eraser'}><Icon name="eraser" /></button>
@@ -174,7 +197,33 @@ export default function App() {
   const [screen, setScreen] = useState<'home' | 'draw' | 'practice'>('home')
   const library = useDrawingLibrary(screen === 'draw')
   const [practiceLevel, setPracticeLevel] = useState<PracticeLevel>('letters')
-  if (screen === 'home') return <Home onDraw={() => setScreen('draw')} onPractice={() => setScreen('practice')} />
-  if (screen === 'practice') return <Practice key={practiceLevel} level={practiceLevel} onLevelChange={setPracticeLevel} onHome={() => setScreen('home')} />
-  return <Workspace library={library} onHome={() => setScreen('home')} />
+  const backgroundAudioRef = useRef<HTMLAudioElement>(null)
+  const [musicPlaying, setMusicPlaying] = useState(false)
+
+  useEffect(() => {
+    const audio = backgroundAudioRef.current
+    if (!audio) return
+    audio.volume = 0.22
+    void audio.play().then(() => setMusicPlaying(true)).catch(() => setMusicPlaying(false))
+    return () => audio.pause()
+  }, [])
+
+  function toggleMusic() {
+    const audio = backgroundAudioRef.current
+    if (!audio) return
+    if (!audio.paused) {
+      audio.pause()
+      setMusicPlaying(false)
+      return
+    }
+    void audio.play().then(() => setMusicPlaying(true)).catch(() => setMusicPlaying(false))
+  }
+
+  const page = screen === 'home'
+    ? <Home onDraw={() => setScreen('draw')} onPractice={() => setScreen('practice')} musicPlaying={musicPlaying} onToggleMusic={toggleMusic} />
+    : screen === 'practice'
+      ? <Practice key={practiceLevel} level={practiceLevel} onLevelChange={setPracticeLevel} onHome={() => setScreen('home')} musicPlaying={musicPlaying} onToggleMusic={toggleMusic} />
+      : <Workspace library={library} onHome={() => setScreen('home')} musicPlaying={musicPlaying} onToggleMusic={toggleMusic} />
+
+  return <>{page}<audio ref={backgroundAudioRef} src={bgMusicUrl} loop preload="auto" /></>
 }
